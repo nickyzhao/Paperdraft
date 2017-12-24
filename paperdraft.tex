@@ -1,0 +1,231 @@
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{amssymb}
+
+\usepackage{lineno}
+
+\journal{Advanced Engineering Informatics}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+\title{A framework for Process Optimization in Engineering Design Based on Hybrid Knowledge Structure Generation and Binary Matrix Factorization}
+
+\author[ad1]{Shubin Zhao\fnref{label1}}
+\ead{nickyzhao@outlook.com}
+
+\author[ad2]{Gang Li\corref{cor2}\fnref{label2}}
+\ead{gang.li@deakin.edu.au}
+
+\author[ad1]{Cheng Xu\corref{cor3}\fnref{label3}}
+\ead{xucheng62@njust.edu.cn}
+
+\cortext[cor2]{Principal corresponding author}
+\cortext[cor3]{Corresponding author}
+\fntext[label1]{This is a specimen author footnote}
+\fntext[label2]{Another author footnote, but a little more longer.}
+\fntext[label3]{Yet another author footnote. Indeed, you can have any number of author footnotes.}
+
+\address[ad1]{Nanjing University of Science and Technology, China}
+\address[ad2]{Deakin University, Australia}
+
+%% Text of abstract & keywords
+
+\begin{abstract}
+Issue-answer decomposing is not a novel method in engineering design area. 
+Decades of study have shown that it is significant for the reuse of implicit knowledge structure in the design process.
+However, the establishment of issue-based knowledge structure remains highly human-involved,
+and limited efforts have been made on the further processing of decomposition results.
+Some have paid attention to the utilization of Design Matrix (DM), which is derived from the structure, 
+in order to solve decoupling problems, or put forward some modular design methodolgy.
+However, the current research and application of DM is mostly limited to the conversion of it 
+to another matrix form, Design Structure Matrix (DSM), which reflects the interaction relationship of system components
+but is insufficient to  handle the situation when internal construction of the system is not clear.
+This paper attemps to propose a framework of process optimization in engineering design field, 
+based on the semi-automatic generation of issue-based Hybrid Knowledge Structure (HKS)
+and a binary matrix factorization method applied directly on DM.
+A case study of electro-hydraulic dram brake design is used 
+to exemplify how process optimization can be accomplished by matrix factorization.
+We also illustrate how HKS works in the process.
+Lastly, in order to highlight the value of our method,
+we briefly discuss some potential research interests and further applications.
+\end{abstract}
+
+\begin{keyword}
+engineering design \sep feature extraction \sep design informatics \sep knowledge structure \sep modularization \sep binary matrix factorization
+\end{keyword}
+
+\end{frontmatter}
+
+%% Start line numbering here if you want
+
+\linenumbers
+
+%% main text
+
+\section{Introduction}\label{sec-intro}
+
+%背景介绍及现状分析
+The extraction and representation of design knowledge in engineering design field 
+remains a time-consuming and highly human-involved task. 
+One of the challenges of most knowledge systems 
+is to offer a comprehensive representation scheme
+to deal with diversities of knowledge types. 
+In engineering design area,
+there might exist texts, data sheets, graphs, engineering drawings, theoretical formulas and so on, 
+some of which are organized in a logically structured way, but some are not.
+
+Regli~{et~al.}~\cite{Regli2000A} decribes the representation of structured knowledge in design documents
+as two types: Process-oriented and Feature-oriented.
+The former originates from Issue-Based Information System (IBIS) framework
+for ongoing design process recording.
+This method, and a few other IBIS-based extending frameworks,
+generally take in the form of a graph, using nodes and links
+to represent knowledge units (issues, answers, arguments, pros and cons, etc.) and their relations.
+These approaches usually reflect the decision-makings, including their reasons, 
+throughout the design process.
+While the latter seeks a more formal framework 
+to model the rationales that exist in design reports, patent documents, manuals, etc.
+In engineering design area, rationales can be considered as objective causalities 
+among functions, design parameters, theoretical derivations, artifacts and manufacturing information.
+A well-organized structuring of these knowledge units 
+can function as an experienced domain expert 
+that supports the decision-makings in a design or redesign process.
+These approaches in essence have an explicit, logical structure 
+and can easily be understood and processed by computers, 
+making it possible that design rationales provide timely, point-to-point support in a design process.
+However, the ease of reuse has also brought with it some disadvantages.
+Establishment of such knowledge systems is inevitably time-consuming,
+and relies heavily on human efforts and expertise.
+
+As for unstructured design knowledge, 
+the extracting appoach usually develops 
+in sync with advancing Text Mining techniques.
+Design documents are first converted into plain texts,
+then tokenization and POS tagging can be done on them.
+Ontology-based entity and concept recognition
+has been a dominant approach for text feature extraction,
+both in industry and academia.
+Lim~{et~al.}~\cite{Lim2010Multi} proposes an ontology-based 
+entity-concept-facet framework for product information extraction,
+based on which possible relations are discovered by semantic tags.
+The dicovery of relations between entities and concepts
+are usually based on an automatic procedure,
+thus having limited precision compared to those manually intensive,
+depending on the performance of adopted algorithm.
+Furtherly, knowledge retrieval based on these methods 
+usually provide the designer with a ranked list of knowledge units,
+based on the matching degree between them and the query.
+In other words, the retrieving process is keyword-based, but not rule-based,
+thus having no point-to-point logic, 
+and basically relying on the designer's mastery of the design issue
+to provide keyword-based queries.
+
+Combinations of above-mentioned approaches have been put forward 
+to make use of their individual advantages. 
+A typical example is Issue, Solution and Artifact Layer (ISAL) model
+for design rationale representation~\cite{Liang2012Learning}.
+The model uses a issue-based triple-layer structure 
+to extract text features as issue-solution pairs and artifact information.
+The causal relations between the pairs and artifact information
+are derived automatically from discrete knowledge units, using text mining techniques, 
+which forms a issue-based, feature-oriented procedure of design rationale extraction.
+The method offers a meaningful hybrid prototype for an integration
+of different knowledge representation schemes.
+
+Above-mentioned researches have provided instructive insight into 
+the extraction of design knowledge units,
+and the establishment of corresponding representation models.
+After that, knowledge retrieval can be conducted 
+with higher precision, multiple options, 
+or even unintentional, but highly related answers.
+However, another critical issue we have to consider in engineering design process 
+is that, solutions of different issues (or their sub-issues) 
+usually proceed in a sequential way, but not a parallel way,
+due to the coupling problem that may occur
+when we attempt to solve several problems at the same time.
+In other words, design process needs to be optimized
+once we have obtained the issue-based, decomposed knowledge struture.
+
+Axiomatic Design (AD)~\cite{Suh2001Axiomatic} provides a theoretical framework
+for the generation of issue-based, tree-like decomposition structure, 
+based on the zigzag mapping between issue domain and answer domain.
+Then DM, a matrix with issues as its rows and answers as its columns, 
+can be naturally generated according to the structure,
+which reflects the correspondence between issues and answers.
+AD views a design process as a favorable one, 
+only if DM is diagonal, or triangular.
+In this sense, DM is of great significance to design process optimization.
+However, how to deal with DM was not discussed in AD.
+Studies addressing this issue 
+have naturally lead to another research area: Modular Design.
+Researchers have been sought to gather those closely-related answers
+into clusters, in order to minimize the correlation between clusters, i.e., modules.
+In this way, the problem has changed 
+from finding a sequence of individual answers to designing a set of modules,
+which can be recognized as common modules, and archived for future reuse. 
+Therefore, the task is to find valid clustering algorithm
+to guarantee the effectiveness of module partitioning.
+Recent advances such as~\cite{Xiao2012New}~and~\cite{Beek2010Modular}
+have introduced DSM to assist in the analysis of 
+interaction relationship between answers to the issues. 
+Distinguished from DM, 
+DSM takes answers as both its rows and columns.
+How they are related to each other and how much they are related
+are considered in the matrix, 
+then clustering algorithm, e.g., k-means method, 
+is utilized to generate modules of the answers.
+Their approaches have offered us some insight
+into the establishment of common module base, 
+especially in engineering design field,
+where reuse of product module is quite frequent.
+However, the conversion of DM into DSM itself does not generate modules, 
+which means specific clustering algorithms have to be adopted for modularization.
+Elements in DSM have to be decided by domain experts,
+in that they explain the specific interaction relationship between system components,
+regularly in the form of a value in the range [0,1],
+representing the intensity of relations.
+
+In this paper, we propose a methodology for building an issue-based hybrid HKS,
+in an attempt to combine ontology-based Named Entity Recognition (NER) 
+with issue-based knowledge representation framework.
+Based on the structure, matrix factorization is conducted directly 
+on DM, in order to extract eigenvectors as fundamental functional modules.
+Particularly, we introduce Binary Matrix Factorization (BMF)~\cite{Zhang2007Binary}
+to deal with binary DM, considering there is usually a relation (1) or no relation (0) 
+from one component to another in concept design stage.
+The rest of the paper is discussed as follows:...
+
+\section{Related work}\label{sec-works}
+
+\subsection{Representation Schemes for Design Knowledge}\label{subsec-representation}
+%具体优缺点展开
+As mentioned in Section \ref{sec-intro}, we have
+
+\subsection{Design Matrix Processing and Modular Design}\label{subsec-modular}
+%由引入
+
+\subsection{Binary Matrix Factorization}\label{subsec-bmf}
+
+\section{Methodological approach}\label{sec-method}
+
+\subsection{Framework}\label{subsec-framework}
+
+\subsection{Knowledge Structure Generation}\label{subsec-structure}
+
+\subsection{Feature Extraction as Modules}\label{subsec-feature}
+
+\section{Case Study and Discussion}\label{sec-case}
+
+\section{Conclusion and Future Work}\label{sec-conclusion}
+
+
+%% References with bibTeX database:
+
+\bibliographystyle{unsrt}
+\bibliography{sample}
+
+\end{document}
